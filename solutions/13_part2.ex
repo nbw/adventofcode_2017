@@ -50,15 +50,52 @@ end
 
 defmodule F do
   def start(walls) do
-    foo(0, walls, 0)
+    hax(walls)
   end
+
+  def hax walls, delay, 0 do
+    delay - 1
+  end
+
+  def hax walls, delay \\ 0, result \\ 1  do
+    new_walls = delay_walls(walls, delay)
+    new_result = foo(0, new_walls, 0)
+    hax(walls, delay + 1, new_result)
+  end
+
+  def delay_walls walls, 0 do
+    IO.inspect walls
+    walls
+  end
+
+  def delay_walls walls, delay do
+    Enum.map(walls, fn(w) ->
+      steps = case (delay) >= (2*(w.size-1)) do
+        true -> rem(delay,(2*(w.size-1)))
+        false -> delay
+      end
+      if rem(delay, 100000) == 0 do
+      IO.puts "Delay: #{delay}, steps: #{steps}, size: #{w.size}"
+      end
+      delay_wall(w, steps)
+    end)
+  end
+
+  def delay_wall wall, 0 do
+    wall   
+  end
+
+  def delay_wall wall, count do
+      Wall.increment(wall)
+      |> delay_wall(count - 1)
+  end
+
   def foo _, [], sum do
     sum
   end
 
   def foo position, walls, sum do
     wall = walls |> List.first
-      IO.puts("position: #{position}, wall_p: #{wall.pos}, sum: #{sum}, wall_n: #{wall.num}")
     if position < wall.num do
       new_walls = Enum.map(walls, fn(w) ->
         Wall.increment(w)
@@ -66,7 +103,7 @@ defmodule F do
       foo(position+1, new_walls, sum)
     else
       new_sum = case(wall.pos == 0) do
-        true -> sum + position * wall.size
+        true -> sum + 1
         false -> sum
       end
       new_walls = Enum.map(walls, fn(w) ->
